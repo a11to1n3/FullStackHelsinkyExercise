@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Courses = ({ courses }) => {
-  return courses.map(course => <Course course={course} />);
+  return courses.map(course => <Course key = {course.id} course={course} />);
 };
 
 const Course = ({ course }) => {
