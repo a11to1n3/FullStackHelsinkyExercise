@@ -1,20 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 
-const Persons = ({persons}) => {
+const Persons = ({ per, setPer }) => {
+  const deleteContact = people => {
+    if (window.confirm(`Delete ${people.person.id}?`)) {
+      setPer(
+        per.filter(person => {
+          if (person.name !== people.person.name) {
+            return person;
+          }
+        })
+      );
+      axios.delete(`http://localhost:3001/persons/${people.person.id}`);
+    }
+  };
 
-  const Person = ({ name, number }) => {
+  const Person = ({ person }) => {
     return (
       <div>
-        {name} {number}
+        {person.name} {person.number}
+        <button
+          onClick={() => {
+            deleteContact({ person });
+          }}
+        >
+          delete
+        </button>
         <br />
       </div>
     );
   };
 
-  const rows = () =>
-    persons.map(person => (
-      <Person key={person.name} name={person.name} number={person.number} />
-    ));
+  const rows = () => {
+    return per.map(person => <Person key={person.name} person={person} />);
+  };
 
   return <div>{rows()}</div>;
 };

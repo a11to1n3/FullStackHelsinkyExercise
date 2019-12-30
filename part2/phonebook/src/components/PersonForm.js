@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import personServices from "../PersonServices";
 
-const PersonForm = ({persons, setPersons}) => {
+const PersonForm = ({ persons, setPersons }) => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
 
@@ -16,15 +17,46 @@ const PersonForm = ({persons, setPersons}) => {
 
   const addContact = event => {
     event.preventDefault();
-    const newContact = { name: newName, number: newNumber };
-    persons.find(person => {
+    const newContact = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1
+    };
+    let nameList = "";
+    let id = "";
+    nameList= persons.find(person => {
       if (person.name === newName) {
-        alert(`${newName} is already added to phonebook`);
-      } else {
-        setPersons(persons.concat(newContact));
-        setNewName("");
+        return newName;
       }
     });
+    id = persons.find(person => {
+      if (person.name === newName) {
+        return person;
+      }
+    }).id;
+    console.log(id)
+    if (window.confirm(`${nameList} is already added to phonebook, replace the old number with a new one?`)) {
+      personServices
+        .update(id,newContact)
+        .then(returnedPerson => {
+          setPersons(persons.map(person => person.id !== id
+            ? person
+            : returnedPerson));
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    } else {
+      personServices
+        .create(newContact)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson));
+          setNewName("");
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
   };
 
   return (
