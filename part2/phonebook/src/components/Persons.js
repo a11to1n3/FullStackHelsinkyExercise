@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const Persons = ({ per, setPer }) => {
+const Persons = ({ setMissing, setDeleted, per, setPer }) => {
   const deleteContact = people => {
-    if (window.confirm(`Delete ${people.person.id}?`)) {
+    if (window.confirm(`Delete ${people.person.name}?`)) {
       setPer(
         per.filter(person => {
           if (person.name !== people.person.name) {
@@ -11,7 +11,22 @@ const Persons = ({ per, setPer }) => {
           }
         })
       );
-      axios.delete(`http://localhost:3001/persons/${people.person.id}`);
+      setDeleted(`Deleted ${people.person.name}`);
+      setTimeout(() => {
+        setDeleted(null);
+      }, 5000);
+      axios
+        .delete(`http://localhost:3001/persons/${people.person.id}`)
+        .catch(error => {
+          if (error.response.request.status === 404) {
+            console.log("I am here");
+            setDeleted(null);
+            setMissing(
+              `Information of user ${people.person.name} was already removed`
+            );
+            setTimeout(() => setMissing(null), 5000);
+          }
+        });
     }
   };
 
