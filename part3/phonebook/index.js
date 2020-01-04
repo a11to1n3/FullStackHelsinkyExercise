@@ -1,9 +1,15 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const morgan = require("morgan");
 
 app.use(bodyParser.urlencoded({ extended: false }));
-
+morgan.token("body", function(req, res) {
+  return JSON.stringify(req.body);
+});
+app.use(
+  morgan(":method :url :status :req[content-length] :response-time ms :body")
+);
 app.use(bodyParser.json());
 
 let persons = [
@@ -89,6 +95,7 @@ app.post("/api/persons", (request, response) => {
 });
 
 const port = 3001;
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
